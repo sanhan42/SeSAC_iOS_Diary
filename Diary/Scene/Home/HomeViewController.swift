@@ -17,7 +17,7 @@ class HomeViewController: BaseViewController {
 //        view.delegate = self // 초기화 전에는 아직 self를 사용 불가능. self는 초기화된 인스턴스를 가르킴.
         // tableview를 let이 아닌 lazy var로 선언하면 가능.
         view.rowHeight = 50
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .systemGray6
         return view
     }() // 즉시 실행 클로저
     
@@ -43,6 +43,8 @@ class HomeViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.titleTextAttributes = [ NSAttributedString.Key.font: UIFont(name: "HelveticaNeue", size: 16)]
         configure()
         setConstraints()
     }
@@ -64,12 +66,18 @@ class HomeViewController: BaseViewController {
         tasks = isClickedFilter ? tempTasks.filter("favorite = true") : tempTasks
     }
     
-    func setLeftBarButtons () {
+    func setLeftBarButtons() {
         let sortBtnTitle = isClickedSort ? "날짜순" : "이름순"
         let filterBtnTitle = isClickedFilter ? "모두보기" : "즐겨찾기"
         let sortButton = UIBarButtonItem(title: sortBtnTitle, style: .plain, target: self, action: #selector(sortButtonClicked))
         let filterButton = UIBarButtonItem(title: filterBtnTitle, style: .plain, target: self, action: #selector(filterButtonClicked))
         navigationItem.leftBarButtonItems = [sortButton, filterButton]
+    }
+    
+    func setRightBarButtons() {
+        let plusButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(plusButtonClicked))
+        let backupButton = UIBarButtonItem(title: "백업", style: .plain, target: self, action: #selector(backupButtonClicked))
+        navigationItem.rightBarButtonItems = [plusButton, backupButton]
     }
    
     override func configure() {
@@ -77,8 +85,7 @@ class HomeViewController: BaseViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(HomeTableViewCell.self, forCellReuseIdentifier: "cell")
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(plusButtonClicked))
+        setRightBarButtons()
     }
     
     func setConstraints() {
@@ -96,6 +103,11 @@ class HomeViewController: BaseViewController {
 //        tasks = localRealm.objects(UserDiary.self).filter("diaryTitle = '오늘의 수업'")
 //        tasks = localRealm.objects(UserDiary.self).filter("diaryTitle CONTAINS[c] '일기'") // [c] 대소문자 관계없이 찾아줄 떄 사용
         isClickedFilter = !isClickedFilter
+    }
+    
+    @objc func backupButtonClicked() {
+        let vc = BackupViewController()
+        transition(vc, transitionStyle: .present)
     }
     
     @objc func plusButtonClicked() {

@@ -36,6 +36,9 @@
 		BF424A2F28B5869000793AA2 /* BaseTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF424A2E28B5869000793AA2 /* BaseTableViewCell.swift */; };
 		BF424A3328B58A6100793AA2 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF424A3228B58A6100793AA2 /* Date+Extension.swift */; };
 		BF424A3528B5D26200793AA2 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF424A3428B5D26200793AA2 /* FileManager+Extension.swift */; };
+		BF444D6B28B6BE41000264DF /* BackupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF444D6A28B6BE41000264DF /* BackupViewController.swift */; };
+		BF444D6D28B6BE8E000264DF /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF444D6C28B6BE8D000264DF /* BackupView.swift */; };
+		BF444D6F28B6C11D000264DF /* BackupTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF444D6E28B6C11D000264DF /* BackupTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +69,9 @@
 		BF424A2E28B5869000793AA2 /* BaseTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTableViewCell.swift; sourceTree = "<group>"; };
 		BF424A3228B58A6100793AA2 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		BF424A3428B5D26200793AA2 /* FileManager+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Extension.swift"; sourceTree = "<group>"; };
+		BF444D6A28B6BE41000264DF /* BackupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupViewController.swift; sourceTree = "<group>"; };
+		BF444D6C28B6BE8D000264DF /* BackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupView.swift; sourceTree = "<group>"; };
+		BF444D6E28B6C11D000264DF /* BackupTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +126,7 @@
 		BF10416828B2EB63006C1050 /* Scene */ = {
 			isa = PBXGroup;
 			children = (
+				BF444D6928B6BE22000264DF /* Backup */,
 				BF424A1E28B57B0A00793AA2 /* Home */,
 				BF424A2128B57B2E00793AA2 /* ImageSearch */,
 				BFE0CB6F28B50D0D00CA7C50 /* Write */,
@@ -172,6 +179,16 @@
 				BF424A2828B57BF900793AA2 /* ImageSearchViewController.swift */,
 			);
 			path = ImageSearch;
+			sourceTree = "<group>";
+		};
+		BF444D6928B6BE22000264DF /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				BF444D6A28B6BE41000264DF /* BackupViewController.swift */,
+				BF444D6C28B6BE8D000264DF /* BackupView.swift */,
+				BF444D6E28B6C11D000264DF /* BackupTableViewCell.swift */,
+			);
+			path = Backup;
 			sourceTree = "<group>";
 		};
 		BFE0CB6F28B50D0D00CA7C50 /* Write */ = {
@@ -282,8 +299,11 @@
 				BF10416A28B2EB6F006C1050 /* WriteView.swift in Sources */,
 				BF424A0D28B578A100793AA2 /* RealmModel.swift in Sources */,
 				BF424A1A28B57A5700793AA2 /* ReusableProtocol.swift in Sources */,
+				BF444D6F28B6C11D000264DF /* BackupTableViewCell.swift in Sources */,
+				BF444D6D28B6BE8E000264DF /* BackupView.swift in Sources */,
 				BF10415828B2E8CF006C1050 /* ViewController.swift in Sources */,
 				BF10415428B2E8CF006C1050 /* AppDelegate.swift in Sources */,
+				BF444D6B28B6BE41000264DF /* BackupViewController.swift in Sources */,
 				BF424A2D28B5861800793AA2 /* HomeTableViewCell.swift in Sources */,
 				BF424A2528B57B8400793AA2 /* ImageDummyData.swift in Sources */,
 				BF424A2F28B5869000793AA2 /* BaseTableViewCell.swift in Sources */,
