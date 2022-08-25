@@ -107,7 +107,7 @@ class HomeViewController: BaseViewController {
     
     @objc func backupButtonClicked() {
         let vc = BackupViewController()
-        transition(vc, transitionStyle: .present)
+        self.transition(vc, transitionStyle: .present)
     }
     
     @objc func plusButtonClicked() {
