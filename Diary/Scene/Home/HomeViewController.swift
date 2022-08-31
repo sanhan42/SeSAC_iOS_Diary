@@ -8,9 +8,24 @@
 import UIKit
 import SnapKit
 import RealmSwift
+import FSCalendar
 
 class HomeViewController: BaseViewController {
-    let localRealm = try! Realm()
+    let repository = UserDiaryRepositoty()
+    
+    lazy var calendar: FSCalendar = {
+        let view = FSCalendar()
+        view.delegate = self
+        view.dataSource = self
+        view.backgroundColor = .white
+        return view
+    }()
+    
+    let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyMMdd"
+        return formatter
+    }()
     
     let tableView: UITableView = {
         let view = UITableView()
@@ -53,17 +68,14 @@ class HomeViewController: BaseViewController {
         super.viewWillAppear(animated)
         setLeftBarButtons()
         fetchRealm()
-//        tasks = localRealm.objects(UserDiary.self).sorted(byKeyPath: "diaryDate", ascending: false) // 호출 시점만 맞다면, 생략해도 잘 작동..
+//        tasks = repository.localRealm.objects(UserDiary.self).sorted(byKeyPath: "diaryDate", ascending: false) // 호출 시점만 맞다면, 생략해도 잘 작동..
 //        tableView.reloadData() // => didSet 으로 처리...
         // 화면 갱신은 화면 전환 코드 및 생명 주기 실행 점검 필요!!
         // present, overCuttentContext, overFullScreen > viewWillAppear 호출X
     }
     
     func fetchRealm() {
-        // Realm 데이터를 정렬해 tasks에 담기.
-        let key = isClickedSort ? "diaryTitle" : "diaryDate"
-        let tempTasks = localRealm.objects(UserDiary.self).sorted(byKeyPath: key, ascending: true)
-        tasks = isClickedFilter ? tempTasks.filter("favorite = true") : tempTasks
+        tasks = repository.fetch(isClickedSort: isClickedSort, isClickedFilter: isClickedFilter)
     }
     
     func setLeftBarButtons() {
@@ -82,6 +94,7 @@ class HomeViewController: BaseViewController {
    
     override func configure() {
         view.addSubview(tableView)
+        view.addSubview(calendar)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(HomeTableViewCell.self, forCellReuseIdentifier: "cell")
@@ -89,8 +102,15 @@ class HomeViewController: BaseViewController {
     }
     
     func setConstraints() {
+        calendar.snp.makeConstraints { make in
+            make.leading.top.trailing.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(300)
+        }
+        
         tableView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(calendar.snp.bottom)
+            make.leading.bottom.trailing.equalTo(view.safeAreaLayoutGuide)
+//            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
     }
     
@@ -100,8 +120,8 @@ class HomeViewController: BaseViewController {
     
     // realm filter query 사용하기 || NSPredicate 사용하기
     @objc func filterButtonClicked() {
-//        tasks = localRealm.objects(UserDiary.self).filter("diaryTitle = '오늘의 수업'")
-//        tasks = localRealm.objects(UserDiary.self).filter("diaryTitle CONTAINS[c] '일기'") // [c] 대소문자 관계없이 찾아줄 떄 사용
+//        tasks = repository.localRealm.objects(UserDiary.self).filter("diaryTitle = '오늘의 수업'")
+//        tasks = repository.localRealm.objects(UserDiary.self).filter("diaryTitle CONTAINS[c] '일기'") // [c] 대소문자 관계없이 찾아줄 떄 사용
         isClickedFilter = !isClickedFilter
     }
     
@@ -126,7 +146,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     @objc func favoriteButtonClicked(btn: UIButton) {
         do {
-            try localRealm.write({
+            try repository.localRealm.write({
                 tasks[btn.tag].favorite = !tasks[btn.tag].favorite
                 fetchRealm()
             })
@@ -153,11 +173,9 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let delete = UIContextualAction(style: .destructive, title: "삭제") { action, view, completionHandler in
             print("delete Button Clicked")
-            self.removeImageFromDocument(fileName: "\(self.tasks[indexPath.row].objectId).jpg")
-            try! self.localRealm.write({
-                self.localRealm.delete(self.tasks[indexPath.row])
-                self.fetchRealm()
-            })
+            
+            self.repository.deleteItem(item: self.tasks[indexPath.row])
+            self.fetchRealm()
         }
         
 //        let example = UIContextualAction(style: .normal, title: "예시") { action, view, completionHandler in
@@ -170,18 +188,21 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView,  trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let favorite = UIContextualAction(style: .normal, title: "즐겨찾기") { action, view, completionHandler in
             print("favorite Button Clicked")
-            try! self.localRealm.write({
-            // 하나의 레코드에서 특정 컬럼 하나만 변경
-                self.tasks[indexPath.row].favorite = !self.tasks[indexPath.row].favorite
-                self.fetchRealm() // didSet 설정을 해뒀기에 reload 되어짐. 이것 대신에 스와이프한 셀 하나만 ReloadRows 코드를 구현해줘도 된다. (보다 효율적)
-            })
+            
+            self.repository.updateFavorite(item: self.tasks[indexPath.row])
+            self.fetchRealm()
+//            try! self.repository.localRealm.write({
+//            // 하나의 레코드에서 특정 컬럼 하나만 변경
+//                self.tasks[indexPath.row].favorite = !self.tasks[indexPath.row].favorite
+//                self.fetchRealm() // didSet 설정을 해뒀기에 reload 되어짐. 이것 대신에 스와이프한 셀 하나만 ReloadRows 코드를 구현해줘도 된다. (보다 효율적)
+//            })
             
             /*
             // 하나의 테이블에서 특정 컬럼 전체 변경
             self.tasks.setValue(true, forKey: "favorite")
             
             // 하나의 레코드에서 여러 컬럼 변경
-            self.localRealm.create(UserDiary.self, value: ["objectId": self.tasks[indexPath.row].objectId, "diaryContent": "변경 테스트", "diaryTitle": "제목임"], update: .modified)
+            self.repository.localRealm.create(UserDiary.self, value: ["objectId": self.tasks[indexPath.row].objectId, "diaryContent": "변경 테스트", "diaryTitle": "제목임"], update: .modified)
              */
         }
         favorite.backgroundColor = .systemCyan
@@ -191,5 +212,27 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 //        }
         
         return UISwipeActionsConfiguration(actions: [favorite])
+    }
+}
+
+extension HomeViewController: FSCalendarDelegate, FSCalendarDataSource {
+    func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
+        return 10
+    }
+    
+//    func calendar(_ calendar: FSCalendar, titleFor date: Date) -> String? {
+//        return "title"
+//    }
+//
+//    func calendar(_ calendar: FSCalendar, imageFor date: Date) -> UIImage? {
+//        return UIImage(systemName: "star.fill")
+//    }
+//
+    func calendar(_ calendar: FSCalendar, subtitleFor date: Date) -> String? {
+        return formatter.string(from: date) == "220907" ? "오프라인 모임" : nil
+    }
+    
+    func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        tasks = repository.fetchDate(isClickedSort: isClickedSort, isClickedFilter: isClickedFilter, date: date)
     }
 }

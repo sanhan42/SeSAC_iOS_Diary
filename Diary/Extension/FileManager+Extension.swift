@@ -8,6 +8,12 @@
 import UIKit
 
 extension UIViewController {
+    
+    func documentDirectoryPath() -> URL? {
+        guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        return documentDirectory
+    }
+    
     func saveImageToDocument(fileName: String, image: UIImage) {
         guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return } // Document 경로
         let fileURL = documentDirectory.appendingPathComponent(fileName) // 세부경로. 이미지를 저장할 위치
@@ -38,6 +44,22 @@ extension UIViewController {
             try FileManager.default.removeItem(at: fileURL)
         } catch let error {
             print(error)
+        }
+    }
+    
+    func fetchDocumentZipFile() {
+        do {
+            guard let path = documentDirectoryPath() else { return }
+            let docs = try FileManager.default.contentsOfDirectory(at: path, includingPropertiesForKeys: nil)
+            print(docs)
+            
+            let zip = docs.filter { $0.pathExtension == "zip" }
+            print("zip : \(zip)")
+            
+            let result = zip.map { $0.lastPathComponent }
+            print("result : \(result)")
+        } catch {
+            print("Error!")
         }
     }
 }

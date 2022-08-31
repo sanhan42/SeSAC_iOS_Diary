@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BackupView: BaseView {
+final class BackupView: BaseView {
     let BackupButton: UIButton = {
         let view = UIButton()
         view.setTitle("백업", for: .normal)
