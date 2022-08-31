@@ -17,7 +17,7 @@ protocol UserDiaryRepositoryType {
     
 }
 
-struct UserDiaryRepositoty: UserDiaryRepositoryType {
+struct UserDiaryRepository: UserDiaryRepositoryType {
     func fetchDate(isClickedSort: Bool, isClickedFilter: Bool, date:Date) -> Results<UserDiary>! {
         let key = isClickedSort ? "diaryTitle" : "diaryDate"
         let tempTasks = localRealm.objects(UserDiary.self).sorted(byKeyPath: key, ascending: true).filter("diaryDate >= %@ AND diaryDate < %@", date, Date(timeInterval: 86400, since: date)) // NSPredicate

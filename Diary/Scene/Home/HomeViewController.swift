@@ -11,7 +11,7 @@ import RealmSwift
 import FSCalendar
 
 class HomeViewController: BaseViewController {
-    let repository = UserDiaryRepositoty()
+    let repository = UserDiaryRepository()
     
     lazy var calendar: FSCalendar = {
         let view = FSCalendar()
